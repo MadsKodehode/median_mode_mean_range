@@ -1,6 +1,7 @@
-#![warn(clippy::unwrap_used)]
+use regex::Regex;
 use std::{collections::HashMap, io, num::ParseIntError};
 fn main() {
+    let re = Regex::new(r"[\s,]+").expect("Invalid regex pattern");
     loop {
         let mut input = String::new();
 
@@ -8,9 +9,9 @@ fn main() {
             .read_line(&mut input)
             .expect("Failed to read line");
 
-        //Parse each comma separated number to i32 and return a Result containing a vec of those i32 nums
+        //Parse each comma or space separated number to i32 and return a Result containing a vec of those i32 nums
         let result: Result<Vec<i32>, ParseIntError> =
-            input.trim().split(',').map(str::parse).collect();
+            re.split(input.trim()).map(str::parse).collect();
 
         //If result was successful
         let mut nums: Vec<i32> = if let Ok(vec) = result {
@@ -21,19 +22,20 @@ fn main() {
         };
 
         let median = median(&mut nums);
-
         let mode = mode(&nums);
         let mean = mean(&nums);
+        let range = range(&nums);
 
-        println!("Median: {median:?}, Mode: {mode:?}, Mean: {mean:?}");
+        println!("Median: {median:?}, Mode: {mode:?}, Mean: {mean:?}, Range: {range:?}");
     }
 }
 
 fn mean(nums: &[i32]) -> f64 {
+    //We need these as float
     let sum = f64::from(nums.iter().sum::<i32>()); //Sum of adding all nums together
     let len = nums.len() as f64; //Cast as f64 to get floating point
 
-    sum / len //We need floating point
+    sum / len
 }
 
 fn mode(nums: &[i32]) -> &i32 {
@@ -74,4 +76,17 @@ fn median(nums: &mut [i32]) -> f64 {
 
         f64::from(*middle)
     }
+}
+
+fn range(nums: &[i32]) -> i32 {
+    let max = nums
+        .iter()
+        .max()
+        .expect("Can't get max number as there are no numbers");
+    let min = nums
+        .iter()
+        .min()
+        .expect("Can't get min number as there are no numbers");
+
+    max - min
 }
