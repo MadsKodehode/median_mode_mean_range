@@ -20,23 +20,35 @@ fn main() {
             continue;
         };
 
-        let mut occurence_map: HashMap<&i32, u8> = HashMap::new();
-
         let median = median(&mut nums);
 
-        //Iterate each n in nums vector and call max_by_key with a function to get the n that occurs the most
-        let mode = nums
-            .iter()
-            .max_by_key(|&n| {
-                let count = occurence_map.entry(n).or_insert(0); //Use n from vector as keys in occurence_map
+        let mode = mode(&nums);
+        let mean = mean(&nums);
 
-                *count += 1; //Increment value of current key
-                *count //Return the one with highest count
-            })
-            .expect("Unable to find mode of nums");
-
-        println!("Median: {median:?}, Mode: {mode:?}");
+        println!("Median: {median:?}, Mode: {mode:?}, Mean: {mean:?}");
     }
+}
+
+fn mean(nums: &[i32]) -> f64 {
+    let sum = f64::from(nums.iter().sum::<i32>()); //Sum of adding all nums together
+    let len = nums.len() as f64; //Cast as f64 to get floating point
+
+    sum / len //We need floating point
+}
+
+fn mode(nums: &[i32]) -> &i32 {
+    //Create new empty HashMap for storing occurences of each n in nums
+    let mut occurence_map: HashMap<&i32, u8> = HashMap::new();
+
+    //Iterate each n in nums vector and call max_by_key with a function to get the n that occurs the most
+    nums.iter()
+        .max_by_key(|&n| {
+            let count = occurence_map.entry(n).or_insert(0); //Use n from nums as keys in occurence_map
+
+            *count += 1; //Increment value of current key
+            *count //Return the one with highest count
+        })
+        .expect("Unable to find mode of nums")
 }
 
 fn median(nums: &mut [i32]) -> f64 {
